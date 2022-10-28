@@ -1,9 +1,14 @@
 const jwt = require('jsonwebtoken');
-var crypto = require('crypto');
+const bcrypt = require('bcrypt');
 const secret = require('../config').secret;
 
 module.exports = (sequelize, DataTypes) => {
-	const User = sequelize.define("users", {
+	const User = sequelize.define("User", {
+		id: {
+			type: DataTypes.INTEGER,
+			autoIncrement: true,
+			primaryKey: true
+		},
 		email: {
 			type: DataTypes.STRING(100),
 			validate: {
@@ -12,12 +17,9 @@ module.exports = (sequelize, DataTypes) => {
 			unique: true,
 			comment: "이메일",
 		},
-		hash: {
+		password: {
 			type: DataTypes.STRING,
 			comment: "비밀번호",
-		},
-		salt: {
-			type: DataTypes.STRING,
 		},
 		username: {
 			type: DataTypes.STRING(50),
@@ -25,6 +27,14 @@ module.exports = (sequelize, DataTypes) => {
 			validate: {
 				min: 2
 			}
+		},
+		bio: {
+			type: DataTypes.STRING,
+			allowNull: true
+		},
+		image: {
+			type: DataTypes.STRING,
+			allowNull: true
 		}
 	}, {
 		charset: "utf8", // 한국어 설정
@@ -34,32 +44,32 @@ module.exports = (sequelize, DataTypes) => {
 		paranoid: true, // timestamps 가 활성화 되어야 사용 가능 > deleteAt 옵션 on      
 	});
 
-	User.prototype.setPassword = function(password) {
-		this.salt = crypto.randomBytes(16).toString('hex');
-		this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+	User.encodePassword = function(password) {
+		return bcrypt.hashSync(password, 10);
 	};
 
 	User.prototype.validPassword = function(password) {      
-		const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
-  	return this.hash === hash;
+  	return bcrypt.compareSync(password, this.password);
 	};
 
 	User.prototype.generateJWT = function() {
-		var today = new Date();
-		var exp = new Date(today);
+		const today = new Date();
+		let exp = new Date(today);
 		exp.setDate(today.getDate() + 60);
 		return jwt.sign({
 			id: this._id,
-			username: this.name,
+			username: this.username,
 			exp: parseInt(exp.getTime() / 1000),
 		}, secret);
 	};
 
 	User.prototype.toAuthJSON = function() {
 		return {
-			username: this.name,
+			username: this.username,
 			email: this.email,
 			token: this.generateJWT(),
+			bio: this.bio,
+			image: this.image
 		};
 	};
 

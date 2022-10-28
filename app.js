@@ -21,7 +21,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(require('./routes'));
 
 // db
-sequelize.sync({ force: false })
+// sequelize.sync({ alter: true })
+sequelize.sync({ sync: true })
 .then(() => {
   console.log('데이터베이스 연결 성공');
 })
