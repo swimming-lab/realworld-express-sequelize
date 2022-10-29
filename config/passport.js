@@ -5,9 +5,9 @@ const { User } = require("../models");
 passport.use(new LocalStrategy({
     usernameField: 'user[email]',
     passwordField: 'user[password]'
-}, (email, password, done) => {
+}, async (email, password, done) => {
   console.log('@@@@@@@@@@@@@@@@@');
-  User.findOne({ email: email })
+  await User.findOne({ email: email })
     .then((user) => {
       if (!user || !user.validPassword(password)) {
         return done(null, false, { errors: {'email or password': 'is invalid'} });

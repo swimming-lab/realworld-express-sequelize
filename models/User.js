@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
 		username: {
 			type: DataTypes.STRING(50),
 			comment: "이름",
+			unique: true,
 			validate: {
 				min: 2
 			}
@@ -57,7 +58,7 @@ module.exports = (sequelize, DataTypes) => {
 		let exp = new Date(today);
 		exp.setDate(today.getDate() + 60);
 		return jwt.sign({
-			id: this._id,
+			id: this.id,
 			username: this.username,
 			exp: parseInt(exp.getTime() / 1000),
 		}, secret);
