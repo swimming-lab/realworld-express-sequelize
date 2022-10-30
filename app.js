@@ -31,8 +31,8 @@ sequelize.sync({ sync: true })
   console.error(err);
 });
 
-// lib
-require('./config/passport');
+// modules
+require('./modules/passport');
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
