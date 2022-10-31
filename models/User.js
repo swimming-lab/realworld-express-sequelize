@@ -74,5 +74,14 @@ module.exports = (sequelize, DataTypes) => {
 		};
 	};
 
+	User.prototype.toProfileJSONFor = async function(user) {
+		return {
+			username: this.username,
+			bio: this.bio,
+			image: this.image || 'https://static.productionready.io/images/smiley-cyrus.jpg',
+			following: user ? await user.hasFollow(this.id) : false
+		};
+	};
+
 	return User;
 };
