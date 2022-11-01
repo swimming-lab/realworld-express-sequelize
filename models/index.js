@@ -24,17 +24,24 @@ const UserFollowUser = sequelize.define('UserFollowUser', {
 }, {
   tableName: 'user_follow_user'
 });
-// const Article = require('./article')(sequelize, DataType)
-// const Comment = require('./comment')(sequelize, DataType)
-// const Tag = require('./tag')(sequelize, DataType)
+const Article = require('./article')(sequelize, DataTypes);
+// const Comment = require('./comment')(sequelize, DataTypes);
+// const Tag = require('./tag')(sequelize, DataTypes);
 
 // Associations.
+
+// User follow user (super many to many)
 User.belongsToMany(User, { through: UserFollowUser, as: 'follows', foreignKey: 'userId', otherKey: 'followId' });
 UserFollowUser.belongsTo(User, { foreignKey: 'userId' })
 User.hasMany(UserFollowUser, { foreignKey: 'followId' })
 
+// Article author User
+Article.belongsTo(User, { as: 'author', foreignKey: {name: 'authorId', allowNull: false} });
+User.hasMany(Article, { as: 'authoredArticles', foreignKey: 'authorId' });
+
 db.User = User;
 db.UserFollowUser = UserFollowUser;
+db.Article = Article;
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
