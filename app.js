@@ -21,9 +21,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(require('./routes'));
 
 // db
-// sequelize.sync({ alter: true })
-// sequelize.drop({ sync: true });
-sequelize.sync({ sync: true })
+// sequelize.drop();
+sequelize.sync({ alter: true })
 .then(() => {
   console.log('데이터베이스 연결 성공');
 })
@@ -45,10 +44,9 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  res.status(err.status).json({ errors: {meesage: res.locals.message} });
   // render the error page
-  // res.status(err.status || 500);
-  // res.render('error');
+  res.status(err.status || 500);
+  res.json({ errors: {meesage: res.locals.message} });
 });
 
 module.exports = app;
