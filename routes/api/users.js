@@ -10,7 +10,7 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/user', auth.required, async (req, res, next) => {
-  await User.findOne({ id: req.auth.id })
+  await User.findByPk(req.auth.id)
     .then((user) => {
       if (!user) { res.sendStatus(401); }
 
@@ -40,7 +40,7 @@ router.post('/users', async (req, res, next) => {
 });
 
 router.put('/user', auth.required, async (req, res, next) => {
-  await User.findOne({ id: req.auth.id })
+  await User.findByPk(req.auth.id)
     .then(async (user) => {
       if (!user) { return res.sendStatus(401); }
 

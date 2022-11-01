@@ -7,7 +7,7 @@ passport.use(new LocalStrategy({
     passwordField: 'user[password]'
 }, async (email, password, done) => {
   console.log('@@@@@@@@@@@@@@@@@');
-  await User.findOne({ email: email })
+  await User.findOne({ where: {email: email} })
     .then((user) => {
       if (!user || !user.validPassword(password)) {
         return done(null, false, { errors: {'email or password': 'is invalid'} });
