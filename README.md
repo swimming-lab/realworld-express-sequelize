@@ -6,6 +6,7 @@ realworld-express-sequelize
 npm install express-generator --save
 npm install sequelize sequelize-cli mysql2 --save
 npm install express-jwt passport passport-local jsonwebtoken bcrypt--save
+npm install slug --save
 
 express --view=pug .
 ```
