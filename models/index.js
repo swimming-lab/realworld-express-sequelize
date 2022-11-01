@@ -22,7 +22,7 @@ const UserFollowUser = sequelize.define('UserFollowUser', {
     }
   },
 }, {
-  tableName: 'UserFollowUser'
+  tableName: 'user_follow_user'
 });
 // const Article = require('./article')(sequelize, DataType)
 // const Comment = require('./comment')(sequelize, DataType)
