@@ -2,6 +2,11 @@ const slug = require('slug');
 
 module.exports = (sequelize, DataTypes) => {
 	const Article = sequelize.define("Article", {
+		id: {
+			type: DataTypes.INTEGER,
+			autoIncrement: true,
+			primaryKey: true
+		},
 		slug: {
 			type: DataTypes.STRING,
 			unique: {

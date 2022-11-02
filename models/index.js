@@ -26,7 +26,7 @@ const UserFollowUser = sequelize.define('UserFollowUser', {
 });
 const Article = require('./article')(sequelize, DataTypes);
 // const Comment = require('./comment')(sequelize, DataTypes);
-// const Tag = require('./tag')(sequelize, DataTypes);
+const Tag = require('./tag')(sequelize, DataTypes);
 
 // Associations.
 
@@ -39,9 +39,14 @@ User.hasMany(UserFollowUser, { foreignKey: 'followId' })
 Article.belongsTo(User, { as: 'author', foreignKey: {name: 'authorId', allowNull: false} });
 User.hasMany(Article, { as: 'authoredArticles', foreignKey: 'authorId' });
 
+// Tag Article
+Article.belongsToMany(Tag, { through: 'article_tag', as: 'tags', foreignKey: 'articleId', otherKey: 'tagId' });
+Tag.belongsToMany(Article, { through: 'article_tag', as: 'taggedArticles', foreignKey: 'tagId', otherKey: 'articleId' });
+
 db.User = User;
 db.UserFollowUser = UserFollowUser;
 db.Article = Article;
+db.Tag = Tag;
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
