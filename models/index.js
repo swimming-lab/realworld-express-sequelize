@@ -43,6 +43,10 @@ User.hasMany(Article, { as: 'authoredArticles', foreignKey: 'authorId' });
 Article.belongsToMany(Tag, { through: 'article_tag', as: 'tags', foreignKey: 'articleId', otherKey: 'tagId' });
 Tag.belongsToMany(Article, { through: 'article_tag', as: 'taggedArticles', foreignKey: 'tagId', otherKey: 'articleId' });
 
+// User favorite Article
+Article.belongsToMany(User, { through: 'user_favorite_article', as: 'favoritedBy', foreignKey: 'articleId', otherKey: 'userId' });
+User.belongsToMany(Article, { through: 'user_favorite_article', as: 'favorites', foreignKey: 'userId', otherKey: 'articleId' });
+
 db.User = User;
 db.UserFollowUser = UserFollowUser;
 db.Article = Article;
