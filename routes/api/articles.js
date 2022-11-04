@@ -45,7 +45,51 @@ router.post('/', auth.required, async (req, res, next) => {
 			article.save()
 		]);
 
-    return res.json({ article: await article.toJSONFor(user) })
+    res.json({ article: await article.toJSONFor(user) });
+  } catch(err) {
+    next(err);
+  }
+});
+
+router.put('/:article', auth.required, async (req, res, next) => {
+	try {
+		const user = await User.findByPk(req.auth.id);
+		if (!user) { res.sendStatus(401); }
+		if (user.id != req.article.authorId) { res.sendStatus(403); }
+
+		const article = req.article;
+		const tagList = req.body.article.tagList;
+
+		if (typeof req.body.article.title !== 'undefined') {
+			article.title = req.body.article.title;
+		}
+		if (typeof req.body.article.description !== 'undefined') {
+			article.description = req.body.article.description;
+		}
+		if (typeof req.body.article.body !== 'undefined') {
+			article.body = req.body.article.body;
+		}
+
+		await Promise.all([
+			typeof tagList === 'undefined' ? null : setArticleTags(req, article, tagList),
+			article.save()
+		]);
+
+    res.json({ article: await article.toJSONFor(user) });
+  } catch(err) {
+    next(err);
+  }
+});
+
+router.delete('/:article', auth.required, async (req, res, next) => {
+	try {
+		const user = await User.findByPk(req.auth.id);
+		if (!user) { res.sendStatus(401); }
+		if (user.id != req.article.authorId) { res.sendStatus(403); }
+
+		await req.article.destroy();
+
+    res.sendStatus(204);
   } catch(err) {
     next(err);
   }
