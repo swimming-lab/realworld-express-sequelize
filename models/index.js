@@ -39,9 +39,13 @@ User.hasMany(UserFollowUser, { foreignKey: 'followId' })
 Article.belongsTo(User, { as: 'author', foreignKey: {name: 'authorId', allowNull: false} });
 User.hasMany(Article, { as: 'authoredArticles', foreignKey: 'authorId' });
 
-// Article Comment
-Comment.belongsTo(Article, { as: 'author', foreignKey: {name: 'authorId', allowNull: false} });
-Article.hasMany(Comment, { as: 'authoredArticles', foreignKey: 'authorId' });
+// Article has Comment
+Article.hasMany(Comment, { foreignKey: 'articleId' });
+Comment.belongsTo(Article, { foreignKey: {name: 'articleId', allowNull: false} });
+
+// Comment author User
+Comment.belongsTo(User, { as: 'author', foreignKey: {name: 'authorId', allowNull: false} });
+User.hasMany(Comment, { foreignKey: 'authorId' });
 
 // Tag Article
 Article.belongsToMany(Tag, { through: 'article_tag', as: 'tags', foreignKey: 'articleId', otherKey: 'tagId' });

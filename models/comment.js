@@ -17,5 +17,15 @@ module.exports = (sequelize, DataTypes) => {
 		paranoid: true, // timestamps 가 활성화 되어야 사용 가능 > deleteAt 옵션 on    
 	});
 
+	Comment.prototype.toJSONFor = async function(user) {
+    return {
+      id: this.id,
+      body: this.body,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      author: await this.author.toProfileJSONFor(user)
+    }
+  }
+
   return Comment
 }
