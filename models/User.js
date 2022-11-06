@@ -38,7 +38,9 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: true
 		}
 	}, {
-		// indexes: [{ fields: ['username'] }, { fields: ['email'] }],
+		// Fix: Too many keys specified; max 64 keys allowed
+		// https://github.com/sequelize/sequelize/issues/9653
+		indexes: [{ fields: ['username'] }, { fields: ['email'] }],
 		charset: "utf8", // 한국어 설정
 		collate: "utf8_general_ci", // 한국어 설정
 		tableName: "users", // 테이블 이름
