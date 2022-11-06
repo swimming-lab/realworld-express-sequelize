@@ -44,7 +44,7 @@ router.post('/:username/follow', auth.required, async (req, res, next) => {
     if (!user) { res.sendStatus(401); }
 
     await user.addFollow(req.profile.id);
-    res.json({ profile: await req.profile.toProfileJSONFor(toProfileJSONForUser) });
+    res.json({ profile: await req.profile.toProfileJSONFor(user) });
   } catch(err) {
     next(err);
   }
@@ -56,7 +56,7 @@ router.delete('/:username/follow', auth.required, async (req, res, next) => {
     if (!user) { res.sendStatus(401); }
 
     await user.removeFollow(req.profile.id);
-    res.json({ profile: await req.profile.toProfileJSONFor(toProfileJSONForUser) });
+    res.json({ profile: await req.profile.toProfileJSONFor(user) });
   } catch(err) {
     next(err);
   }
