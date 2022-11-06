@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const auth = require('../../modules/auth');
-const { User, Article, Comment, Tag } = require("../../models");
+const { User, Article, Comment, Tag, UserFollowUser } = require("../../models");
 
 router.param('article', async (req, res, next, slug) => {
   await Article.findOne({ where: {slug: slug} })
@@ -44,26 +44,49 @@ router.get('/', auth.optional, async (req, res, next) => {
 	try {
 		let limit = 20;
     let offset = 0;
-		let author = null;
-    if (typeof req.query.limit !== 'undefined') { limit = req.query.limit }
-    if (typeof req.query.offset !== 'undefined') { offset = req.query.offset }
-		if (typeof req.query.author !== 'undefined') { author = req.query.author }
 
-		let user = null;
-		if (req.auth) {
-			user = await User.findByPk(req.auth.id);
-		}
+		const criteria = {};
+    if (typeof req.query.limit !== 'undefined') { limit = Number(req.query.limit) }
+    if (typeof req.query.offset !== 'undefined') { offset = Number(req.query.offset) }
+		if (typeof req.query.author !== 'undefined') { criteria.auth = req.query.author }
+		if (typeof req.query.favorited !== 'undefined') { criteria.favorited = req.query.favorited }
+		if (typeof req.query.tag !== 'undefined') { criteria.tag = req.query.tag }
 
-		let article = new Article(req.body.article);
-		article.authorId = user.id;
+		const [{count, rows}, user] = await Promise.all([
+			Article.findAllAndCountByMultiplecriteria(offset, limit, criteria),
+			req.auth ? await User.findByPk(req.auth.id) : null
+		])
 
-		const tagList = req.body.article.tagList;
-		await Promise.all([
-			typeof tagList === 'undefined' ? null : setArticleTags(req, article, tagList),
-			article.save()
-		]);
+    res.json({
+			articles: await Promise.all(rows.map((article) => {
+				return article.toJSONFor(user)
+			})),
+			articlesCount: count
+		});
+  } catch(err) {
+    next(err);
+  }
+});
 
-    res.json({ article: await article.toJSONFor(user) });
+router.get('/feed', auth.required, async (req, res, next) => {
+	try {
+		let limit = 20;
+    let offset = 0;
+
+		if (typeof req.query.limit !== 'undefined') { limit = Number(req.query.limit) }
+    if (typeof req.query.offset !== 'undefined') { offset = Number(req.query.offset) }
+
+		const user = await User.findByPk(req.auth.id);
+		if (!user) { return res.sendStatus(401); }
+
+		const {count, rows} = await Article.findAllAndCountByUserFollowed(offset, limit, user);
+
+		res.json({
+			articles: await Promise.all(rows.map((article) => {
+				return article.toJSONFor(user)
+			})),
+			articlesCount: count
+		});
   } catch(err) {
     next(err);
   }
